@@ -22,7 +22,7 @@ export const validateUserPassword = async (password: string, userPassword: strin
 
 export const generateLoginResponse = (user: User): LoginResponse => {
   return {
-    access_token: jwt.sign({ email: user.email, id: user._id }, process.env.JWT_TOKEN_SECRET),
+    access_token: jwt.sign({ email: user.email, id: user._id }, process.env.JWT_TOKEN_SECRET as jwt.Secret),
     expires_in: 86400,
     token_type: 'Bearer'
   };
@@ -38,18 +38,19 @@ export const validateUser = async (
   }
   const jwtUser = jwt.verify(
     authorizationHeader.replace('Bearer ', ''),
-    process.env.JWT_TOKEN_SECRET
+    process.env.JWT_TOKEN_SECRET as jwt.Secret
   ) as unknown as JWTUser;
   const user = await UserDB.findById(jwtUser.id).select('-password -businesses');
   if (!user) {
     throw new UnauthorizedError();
   }
 
+  const getUserBusinessGrantType = (): GrantType => {
+    return user.businesses?.find(b => b.business.toString() === businessId)?.grantType || GrantType.View;
+  };
+
   if (granType) {
-    validateGrantType(
-      granType,
-      user.isAdmin ? GrantType.Admin : user.businesses.find(b => b.business.toString() === businessId).grantType
-    );
+    validateGrantType(granType, user.isAdmin ? GrantType.Admin : getUserBusinessGrantType());
   }
   return user;
 };
