@@ -14,4 +14,4 @@ export const UserSchema: Schema = new Schema({
   person: { type: Schema.Types.ObjectId, ref: ModelName.Person, required: true }
 });
 
-export default mongoose.model<User>(ModelName.User, UserSchema);
+module.exports = mongoose.models.User || mongoose.model<User>(ModelName.User, UserSchema);
