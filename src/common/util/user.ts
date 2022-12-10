@@ -46,7 +46,11 @@ export const validateUser = async (
   }
 
   const getUserBusinessGrantType = (): GrantType => {
-    return user.businesses?.find(b => b.business.toString() === businessId)?.grantType || GrantType.View;
+    return (
+      user.businesses?.find(
+        (b: { business: { toString: () => string | undefined } }) => b.business.toString() === businessId
+      )?.grantType || GrantType.View
+    );
   };
 
   if (granType) {
