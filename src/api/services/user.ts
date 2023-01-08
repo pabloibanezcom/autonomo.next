@@ -1,21 +1,18 @@
-import { LoginData, LoginResponse, User } from '@autonomo/common';
-import { generateLoginResponse, validateUser, validateUserPassword } from '../../common/util/user';
+import bcrypt from 'bcrypt';
+import LoginData from '../../common/interfaces/auth/LoginData';
+import User from '../../common/interfaces/User';
 import { UnauthorizedError } from '../httpError/httpErrors';
 import UserDB from '../models/user';
 
-export const login = async (loginData: LoginData): Promise<LoginResponse> => {
+export const simpleLogin = async (loginData: LoginData): Promise<User> => {
   const user = await UserDB.findOne({ email: loginData.email.toLowerCase() });
   if (!user) {
     throw new UnauthorizedError();
   }
-  const isValidPassword = await validateUserPassword(loginData.password, user.password);
+  const isValidPassword = await bcrypt.compare(loginData.password, user.password);
   if (!isValidPassword) {
     throw new UnauthorizedError();
   }
 
-  return generateLoginResponse(user);
-};
-
-export const getUser = async (authorizationHeader: string): Promise<User> => {
-  return await validateUser(authorizationHeader);
+  return user;
 };
