@@ -45,8 +45,8 @@ jobs:
         run: npm run build
       - uses: actions/upload-artifact@v3
         with:
-          name: dist
-          path: dist
+          name: .next
+          path: .next
 
   test:
     needs: [lint, build]
@@ -63,7 +63,7 @@ jobs:
         run: npm ci
       - uses: actions/download-artifact@v3
         with:
-          name: dist
-          path: dist
+          name: .next
+          path: .next
       - name: Test
         run: npm run test:ci
