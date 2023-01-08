@@ -6,6 +6,7 @@ import GithubProvider from 'next-auth/providers/github';
 import GoogleProvider from 'next-auth/providers/google';
 import connectDB from '../../../src/api/middleware/mongodb';
 import { simpleLogin } from '../../../src/api/services/user';
+import LoginData from '../../../src/common/interfaces/auth/LoginData';
 
 export const authOptions: NextAuthOptions = {
   session: {
@@ -28,7 +29,7 @@ export const authOptions: NextAuthOptions = {
         password: { label: 'Password', type: 'password' }
       },
       async authorize(credentials, req) {
-        const user = await simpleLogin(req.query);
+        const user = await simpleLogin(req.query as LoginData);
 
         if (user) {
           return { ...user, id: user._id.toString() };
