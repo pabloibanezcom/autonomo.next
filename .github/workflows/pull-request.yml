@@ -67,3 +67,23 @@ jobs:
           path: .next
       - name: Test
         run: npm run test:ci
+
+  e2e:
+    needs: [lint, build]
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v3
+        with:
+          cache: 'npm'
+          node-version: '18'
+      - name: Install dependencies
+        run: npm ci
+      - uses: actions/download-artifact@v2
+        with:
+          name: .next
+          path: .next
+      - name: e2e Test
+        run: npm run e2e:headless
